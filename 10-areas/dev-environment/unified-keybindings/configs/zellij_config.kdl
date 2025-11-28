@@ -1,0 +1,15 @@
+// Zellij keybinds for unified vi-style stack
+keybinds {
+    // Apply in all modes that aren't locked, tmux, etc.
+    shared_except "locked" "tmux" {
+        // --- Stack navigation: Alt-u / Alt-i -------------------------
+        // Alt-u  => previous pane in the stack (Up)
+        // Alt-i  => next pane in the stack (Down)
+        //
+        // Works both in normal tiled layouts and when panes are stacked.
+        // In a stack, this effectively cycles through the visible pane.
+
+        bind "Alt u" { MoveFocus "Up"; }
+        bind "Alt i" { MoveFocus "Down"; }
+    }
+}

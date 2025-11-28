@@ -1,0 +1,30 @@
+# Helix configuration (Crostini-friendly, unified vi motion)
+theme = "base16-tokyo-night-dark"
+
+[editor]
+line-number = "relative"
+cursorline = true
+cursorcolumn = false
+bufferline = "multiple"
+auto-format = true
+true-color = true
+mouse = true
+shell = ["bash", "-lc"]
+clipboard-provider = "x-clip"
+
+[editor.statusline]
+left = ["mode", "spacer", "diagnostics", "selections"]
+center = ["file-name"]
+right = ["position", "file-type", "version-control"]
+
+[editor.file-picker]
+hidden = true
+git-ignore = true
+
+[keys.normal.C-y]
+# Open the file(s) in the current window
+y = ":sh zellij run -n Yazi -c -f -x 10% -y 10% --width 80% --height 80% -- bash ~/.config/helix/yazi-picker.sh open"
+# Open the file(s) in a vertical split
+v = ":sh zellij run -n Yazi -c -f -x 10% -y 10% --width 80% --height 80% -- bash ~/.config/helix/yazi-picker.sh vsplit"
+# Open the file(s) in a horizontal split
+h = ":sh zellij run -n Yazi -c -f -x 10% -y 10% --width 80% --height 80% -- bash ~/.config/helix/yazi-picker.sh hsplit"

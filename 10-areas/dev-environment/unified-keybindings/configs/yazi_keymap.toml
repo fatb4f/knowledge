@@ -1,0 +1,87 @@
+[mgr]
+
+# --- Smart navigation & ops ---
+[[mgr.prepend_keymap]]
+on   = "l"
+run  = "plugin smart-enter"
+desc = "Enter dir or open file"
+
+[[mgr.prepend_keymap]]
+on   = "p"
+run  = "plugin smart-paste"
+desc = "Smart paste (dir or CWD)"
+
+[[mgr.prepend_keymap]]
+on   = "y"
+run  = [ 'shell -- echo "$@" | xclip -i -selection clipboard -t text/uri-list', "yank" ]
+desc = "Copy paths to clipboard"
+
+[[mgr.prepend_keymap]]
+on   = "T"
+run  = "plugin toggle-pane min-preview"
+desc = "Toggle min preview (plugin)"
+
+# --- Preview controls ---
+[[mgr.prepend_keymap]]
+on   = ["ctrl-p"]
+run  = "toggle_preview"
+desc = "Toggle preview"
+
+[[mgr.prepend_keymap]]
+on   = ["ctrl-]"]
+run  = "set preview_ratio=+5%"
+desc = "Increase preview width"
+
+[[mgr.prepend_keymap]]
+on   = ["ctrl-["]
+run  = "set preview_ratio=-5%"
+desc = "Decrease preview width"
+
+[[mgr.prepend_keymap]]
+on   = "R"
+run  = "redraw"
+desc = "Redraw UI"
+
+# --- VCS & LazyGit ---
+[[mgr.prepend_keymap]]
+on   = [ "g", "c" ]
+run  = "plugin vcs-files"
+desc = "Show Git changes"
+
+[[mgr.prepend_keymap]]
+on   = ["ctrl-g"]
+run  = "shell 'zellij action new-pane --template git_root --floating --width 80% --height 80%' --confirm"
+desc = "LazyGit (floating @ repo root)"
+
+# --- Editing & shell ---
+[[mgr.prepend_keymap]]
+on   = "e"
+run  = "shell -- hx "$@""
+desc = "Edit with Helix"
+
+[[mgr.prepend_keymap]]
+on   = ["ctrl-e"]
+run  = "shell 'if [ $# -gt 0 ]; then zellij action new-pane --floating --width 85% --height 85% -- hx "$@"; else zellij action new-pane --template edit_hx --floating --width 85% --height 85%; fi' --block --confirm"
+desc = "Helix (floating)"
+
+[[mgr.prepend_keymap]]
+on   = "!"
+run  = "shell -- $SHELL"
+desc = "Open shell here"
+
+# --- Format / Lint (deduplicated) ---
+[[mgr.prepend_keymap]]
+on   = "F"
+run  = "shell -- yfmt "$@""
+desc = "Format with yfmt"
+
+[[mgr.prepend_keymap]]
+on   = "L"
+run  = "shell -- ylint "$@""
+desc = "Lint with ylint"
+
+# --- Search: keep '/' for built-in, move external ripgrep to '?' ---
+[[mgr.prepend_keymap]]
+on   = "?"
+run  = "shell -- rg --line-number --hidden --glob '!.git' --smart-case -- '' | less -R"
+desc = "External ripgrep to pager"

@@ -1,0 +1,44 @@
+# --- Yazi minimalist config (Crostini) ---
+
+[mgr]
+ratio = [0,3,5]
+show_hidden = true
+sort_by = "natural"
+linemode = "none"
+scrolloff = 3
+
+[preview]
+tab_size = 2
+max_width = 120
+max_height = 80
+wrap = "yes"
+
+[plugin]
+# --------------------------------------------------------------------
+# Inline previewers (rich-cli + eza)
+# --------------------------------------------------------------------
+prepend_previewers = [
+  # rich for common dev types
+  { name = "*.md",   run = "rich-preview" },
+  { name = "*.json", run = "rich-preview" },
+  { name = "*.csv",  run = "rich-preview" },
+  { name = "*.toml", run = "rich-preview" },
+  { name = "*.yml",  run = "rich-preview" },
+  { name = "*.yaml", run = "rich-preview" },
+  { name = "*.sh",   run = "rich-preview" },
+  { name = "*.lua",  run = "rich-preview" },
+  { name = "*.py",   run = "rich-preview" },
+
+  # text-ish MIME fallback (catches e.g. .gitignore, .env, etc.)
+  { mime = "text/*", run = "rich-preview" },
+
+  # directories via eza
+  { name = "*/",     run = "eza-preview" },
+
+  # final fallback: show type list if nothing matched
+  { mime = "*",      run = "mime-file-types" }
+]
+
+# (optional) if you want yazi to treat dotfiles as visible by default:
+# [manager]
+# show_hidden = true
