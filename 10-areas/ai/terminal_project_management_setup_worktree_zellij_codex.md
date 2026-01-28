@@ -1,5 +1,7 @@
 # Terminal Project Management Setup (Worktree + Zellij + Codex)
 
+See annex: `proposal_xx.md` for a decision checklist and keymap defaults.
+
 ## Recommended method (practical + scalable)
 
 - **One worktree per task/packet/issue**, rooted at `../wt/<repo>/<task>` with its own terminal session.
@@ -214,3 +216,9 @@ Inside the session note (`.session.md`), include:
 - `done:` explicit criteria
 
 This keeps “project management” deterministic while preserving isolation.
+
+---
+
+# Annex
+
+- `proposal_xx.md`
