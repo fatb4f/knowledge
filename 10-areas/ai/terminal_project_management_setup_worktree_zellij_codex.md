@@ -1,224 +1,170 @@
-# Terminal Project Management Setup (Worktree + Zellij + Codex)
+# Yazi-Driven ProjectOps (Nav/FileOps/GitStats/ProjectOps)
 
-See annex: `proposal_xx.md` for a decision checklist and keymap defaults.
+Rev: 5 | Last Updated: 2026-01-29
 
-## Recommended method (practical + scalable)
+## Control map
 
-- **One worktree per task/packet/issue**, rooted at `../wt/<repo>/<task>` with its own terminal session.
-- **One terminal session per worktree** (Zellij or tmux), named to match the worktree folder.
-- **One agent session per worktree** (Codex TUI attached to that session), not per repo.
-- A tiny **session index note** per worktree (e.g., `../wt/<repo>/ledger/sessions/<date>-<task>.md`) to keep human context stable.
-
-### Why this works
-
-- Worktrees isolate git state (no dirty main, no accidental branch mixing).
-- Session naming prevents sending commands to the wrong repo.
-- Codex TUI tied to a single worktree reduces context contamination.
+| Layer | Responsibility | Mechanism (SSOT) | Notes |
+|---|---|---|---|
+| **Nav** | browse/select repos/files | **Yazi core** | Pre-worktree driver. |
+| **File ops** | extra file actions | **Yazi `shell` commands** | Use `%h/%s/%d` + `--block` for TUIs. |
+| **Git stats** | local git context | **Yazi git plugins** | `vcs-files` + `githead` + `path-from-root` + `lazygit`. |
+| **ProjectOps** | WT/session/gates | **Yazi `shell` → `just …`** | `just` is the control plane; Yazi triggers it. |
 
 ---
 
-## Concrete conventions (low-friction)
+## Core invariant
 
-- **Worktrees:** `../wt/<repo>/<packet-id>-<shortname>`
-- **Branch names:** `packet/<id>-<shortname>`
-- **Zellij session name:** `wt:$WORKTREE_NAME` (via lazyworktree config)
-- **Codex TUI:** always launched from the worktree root
+**ProjectOps is never implemented in Yazi.**
+
+- Yazi only launches `just <verb>` from the current selection context.
+- `just` (and underlying scripts) is the authoritative controller for:
+  - worktree creation/selection
+  - session attach/create
+  - layout selection
+  - gates/runbooks
+  - notes/backlog policy
 
 ---
 
-## Implementation (lazyworktree + Zellij)
+## Yazi keybinds (ProjectOps)
 
-Lazyworktree handles worktree creation, branch naming, and session lifecycle. Zellij tabs are configured via `custom_commands` and `zellij` fields.
+Place in `~/.config/yazi/keymap.toml`.
 
-### Core config
+**Notes**
+- `%h` = hovered path
+- `--block` is required for interactive TUIs
 
-Add a Zellij command to `~/.config/lazyworktree/config.yaml`:
+```toml
+[[mgr.prepend_keymap]]
+on   = ["g", "w"]
+run  = "shell --block -- bash -lc 'cd \"$(dirname \"%h\")\" && just wt'"
+desc = "ProjectOps: worktree menu (from hovered)"
 
-```yaml
-session_prefix: "wt-"
+[[mgr.prepend_keymap]]
+on   = ["g", "s"]
+run  = "shell --block -- bash -lc 'cd \"$(dirname \"%h\")\" && just sess'"
+desc = "ProjectOps: zellij session attach/create"
 
-custom_commands:
-  "Z":
-    description: Zellij session
-    show_help: true
-    zellij:
-      session_name: "wt:$WORKTREE_NAME"
-      attach: true
-      on_exists: "switch"
-      windows:
-        - name: backlog
-          command: "bash -lc \"$EDITOR backlog.md\""
-        - name: session
-          command: "bash -lc \"$EDITOR .session.md\""
-        - name: shell
-          command: fish
-        - name: files
-          command: yazi
-        - name: codex
-          command: codex
-```
+[[mgr.prepend_keymap]]
+on   = ["g", "p"]
+run  = "shell --block -- bash -lc 'cd \"$(dirname \"%h\")\" && just preflight'"
+desc = "ProjectOps: preflight gate"
 
-Notes:
-- `session_prefix` controls which sessions show up in the command palette.
-- Zellij session names are sanitized by lazyworktree (`/`, `\`, `:` → `-`).
+[[mgr.prepend_keymap]]
+on   = ["g", "c"]
+run  = "shell --block -- bash -lc 'cd \"$(dirname \"%h\")\" && just check'"
+desc = "ProjectOps: check gate"
 
-### Fish shell integration
-
-Lazyworktree ships fish helpers and completion generation. Source the fish functions once and add completions:
-
-```fish
-# config.fish
-source /path/to/lazyworktree/shell/functions.fish
-
-# completions
-lazyworktree completion fish --code > ~/.config/fish/completions/lazyworktree.fish
+[[mgr.prepend_keymap]]
+on   = ["g", "m"]
+run  = "shell --block -- bash -lc 'cd \"$(dirname \"%h\")\" && just promote'"
+desc = "ProjectOps: promote gate"
 ```
 
 ---
 
-## Usage
+## Yazi plugins (high-signal)
+
+### Shell helpers
+- `custom-shell.yazi`
+- `command.yazi`
+- `yazi-prompt.sh` (optional)
+
+### Git utils
+- `lazygit.yazi`
+- `vcs-files.yazi`
+- `githead.yazi`
+- `path-from-root.yazi`
+- `git.yazi` (optional)
+
+Example installs (ya pkg)
 
 ```bash
-# from repo root
-lazyworktree
+ya pkg add AnirudhG07/custom-shell
+ya pkg add KKV9/command
+ya pkg add Lil-Dank/lazygit
 
-# create a worktree (press "c") and jump into it (Enter)
-# open the Zellij session (press "Z")
+ya pkg add yazi-rs/plugins:vcs-files
+ya pkg add llanosrocas/githead
+ya pkg add aresler/path-from-root
+ya pkg add yazi-rs/plugins:git
 ```
 
 ---
 
-# Python project managers / environments (high-signal)
+## `just` contract (ProjectOps SSOT)
 
-Most projects are Python-based, so standardize on one of these:
+Implement these recipes in your repo-root `justfile` (or a shared include):
 
-- **uv**: fast, unified toolchain (project mgmt, lockfiles, tool installs, Python installs, scripts).
-- **Poetry**: mature, common choice for dependency + packaging with `poetry.lock`.
-- **PDM**: PEP-focused manager with lockfiles and optional PEP 582 (rejected PEP) workflow.
-- **Hatch**: project manager + build backend (Hatchling) + envs.
-- **Pixi**: conda-forge + PyPI, multi-language envs, lockfiles, tasks.
-- **Miniforge**: conda-forge installer including conda + mamba for robust binary envs.
+- `wt`        — worktree menu/create/enter (calls `lazyworktree` or wrapper)
+- `sess`      — attach/create zellij session for the current worktree root
+- `preflight` — run gate 1
+- `check`     — run gate 2
+- `promote`   — run gate 3
 
-Pick **uv** as the default unless you need conda-forge (then use Pixi or Miniforge).
+### Expectations (to avoid surprises)
 
----
+- `sess` assumes you are in a worktree root whose directory name is `<id>-<slug>` so it can derive `id` via `${base%%-*}`.
+- If you trigger `sess` from Yazi, do so while hovering inside `../wt/<repo>/...` (existing worktrees), or prefer `wt` for the pre-WT flow.
+  - If your worktrees live under `.codex/.worktrees/...`, hover there instead.
+  - `sess` normalizes to the git worktree root; avoid running it in non-git directories.
 
-# Tools (yazi-centric)
+### Minimal `justfile` skeleton (composable)
 
-Yazi is the preferred file manager for this workflow:
+This version avoids backtick variables so it can be included cleanly; other recipes can call `just repo-root` / `just repo-name`.
 
-- Add a Zellij tab for yazi (see config above).
-- Use yazi plugins (e.g., custom-shell to run lazygit) inside the worktree.
-- Leverage yazi IPC (`ya emit ...`) to script file/navigation actions when needed.
-- Optional: open yazi in a floating Neovim window via yazi.nvim; launch lazyworktree from yazi with a custom-shell command.
+```make
+set shell := ["bash", "-uc"]
 
-### Plugin + IPC examples
+# ---- repo identity (composable) ----
+repo-root:
+  git rev-parse --show-toplevel
 
-`keymap.toml` (plugin example: lazygit via custom-shell):
+repo-name:
+  basename "$(just repo-root)"
 
-```toml
-[[mgr.prepend_keymap]]
-on  = [ "g", "l" ]
-run = "plugin custom-shell -- custom auto lazygit"
-desc = "lazygit"
+# ---- worktree ops ----
+wt:
+  # choose: run lazyworktree or your wrapper
+  lazyworktree
+
+# ---- session ops (worktree-scoped) ----
+# Derives id from worktree dir name: <id>-<slug>
+# Uses an ABSOLUTE layout path rooted at repo-root for determinism.
+sess:
+  wt_root="$$(git rev-parse --show-toplevel 2>/dev/null || pwd)"; \
+  repo_root="$$(just repo-root)"; \
+  repo_name="$$(just repo-name)"; \
+  layout="$$repo_root/tools/wt/layout.packet.kdl"; \
+  base="$$(basename "$$wt_root")"; \
+  case "$$base" in *-*) : ;; *) echo "ERR: worktree dir must be <id>-<slug>"; exit 2 ;; esac; \
+  id="$${base%%-*}"; \
+  sess="$$repo_name-$$id"; \
+  if zellij list-sessions 2>/dev/null | awk '{print $$1}' | grep -qx "$$sess"; then \
+    zellij attach "$$sess"; \
+  else \
+    cd "$$wt_root"; \
+    zellij --new-session-with-layout "$$layout" -s "$$sess"; \
+  fi
+
+# ---- gates/runbooks ----
+preflight:
+  tools/tasks/preflight.sh
+
+check:
+  tools/tasks/check.sh
+
+promote:
+  tools/tasks/promote.sh
 ```
 
-`keymap.toml` (IPC example: jump to git root):
-
-```toml
-[[mgr.prepend_keymap]]
-on  = [ "g", "r" ]
-run = 'shell -- ya emit cd "$(git rev-parse --show-toplevel)"'
-desc = "cd to git root"
-```
-
-Optional plugin to run arbitrary commands (e.g., launch lazyworktree from yazi):
-
-```toml
-[[mgr.prepend_keymap]]
-on  = [ "g", "w" ]
-run = "plugin custom-shell -- custom fish 'lazyworktree' --orphan"
-desc = "lazyworktree (shell)"
-```
-
 ---
 
-# Plugin provider scope + stability notes
+## Decisions required to finalize (5)
 
-“Plugin provider” here includes runtime/API surface, distribution/versioning, and the stated stability/compatibility contract.
-
-### Capability snapshot
-
-**Yazi (plugins + `ya pkg`)**
-- Runtime/language: Lua.
-- Plugins can be: functional key-bound actions + previewers/preloaders in the preview pipeline.
-- Execution model: async-first with a sync context for UI/state; async plugins can sync-block to read/modify state.
-- Cross-instance/eventing: DDS pub/sub across instances via Lua `ps` API and CLI `ya pub/emit`.
-- Packaging: `ya pkg` clones from GitHub and locks revisions/hashes in `package.toml`.
-
-**Zellij (WASM/WASI plugins)**
-- Runtime/language: WASM/WASI (Rust officially supported; other languages possible).
-- Plugins can: subscribe to events, call commands, access the launch folder, offload work to async workers, and render UI as panes.
-- Distribution: load `.wasm` via URL schemes (`http(s)`, `file:`, `zellij:`); no built-in package manager.
-
-### Stability / compatibility posture
-
-**Yazi**
-- Plugin system labeled beta/early; many plugins track latest Yazi (HEAD).
-- `ya` and `yazi` versions must match exactly.
-- Practical risk: higher churn; pin Yazi + `ya` + plugin revisions together.
-
-**Zellij**
-- Plugin system is early-stage but publishes upgrade notes and aims for forward-compat (with caveats).
-- Practical risk: still evolving, but more explicit upgrade guidance.
-
-### Practical guidance
-
-- Need deep file-manager integration (previewers, preloaders, file actions, multi-instance sync): invest in Yazi, but pin versions.
-- Need lower-maintenance plugin posture for UI panes/dashboards/multiplexer control: prefer Zellij’s plugin surface.
-
----
-
-# Backlog.md (repo-local project management)
-
-## Role in this workflow
-
-Backlog.md provides a **repo-native task system** that works well with worktrees:
-
-- Use **Backlog.md CLI** (if installed) to manage richer task metadata and a Kanban board.
-- Keep “human context” in a simple `.session.md` note inside the worktree (manual or generated by a post-create hook).
-- Optionally keep a lightweight `backlog.md` scratchpad in the worktree for quick notes.
-
-## Two modes
-
-### Mode A — Minimal (no Backlog.md CLI required)
-
-Use `backlog.md` as the task scratchpad for the worktree:
-
-- `backlog.md` holds a tiny checklist.
-- `.session.md` holds constraints, command log, and state (GREEN/YELLOW/RED).
-
-### Mode B — Backlog.md CLI (terminal Kanban)
-
-When Backlog.md is installed:
-
-- Initialize once per repo: `backlog init "<Project Name>"`
-- Create tasks: `backlog task create "<task>"`
-- Show terminal board in a pane: `backlog board view`
-
-## Suggested task ↔ worktree linkage
-
-Inside the session note (`.session.md`), include:
-
-- `task_id:` (packet-id)
-- `worktree:` path
-- `branch:` name
-- `done:` explicit criteria
-
-This keeps “project management” deterministic while preserving isolation.
-
----
-
-# Annex
-
-- `proposal_xx.md`
+1. **Packet/worktree ID derivation**: directory name (`<id>-<slug>`) vs prompt vs git branch.
+2. **Worktree base path**: `../wt/...` vs `.codex/.worktrees/...`.
+3. **Session naming**: keep deterministic (recommended: `<repo>-<id>`).
+4. **`just wt` implementation**: call `lazyworktree` vs custom selector.
+5. **Log capture location for gates**: `.codex/out/<id>/…` vs `ledger/…` vs `./logs/…` (pick one as SSOT; gates should write there and print the pointer).
