@@ -1,0 +1,16 @@
+{
+  "artifact_type": "check_envelope",
+  "artifact_version": "v1",
+  "kind": "check",
+  "name": "schema.valid",
+  "ts": "2026-03-31T12:00:01Z",
+  "status": "pass",
+  "details": {},
+  "lineage": {
+    "generated_from": null,
+    "validated_against": [
+      "/home/chronos/src/kernel/runtime/runtime.binding.v1.json",
+      "/home/chronos/.local/opt/knowledge/10-areas/local.stack/runtime/runtime.binding.v1.json"
+    ]
+  }
+}

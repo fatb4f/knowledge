@@ -1,0 +1,9 @@
+{
+  "task": "verify",
+  "status": "ok",
+  "checks": [
+    "cue vet specs/fixtures/*.json specs/cue/*.cue",
+    "python -m py_compile review/inspect_generated.py",
+    "python -m py_compile generated/python/*.py"
+  ]
+}

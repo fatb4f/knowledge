@@ -1,0 +1,9 @@
+# Verify task contract.
+#
+# Primary checks:
+#   cue vet ./specs/fixtures/*.json ./specs/cue/*.cue
+#   uv run python -m py_compile ./review/inspect_generated.py
+#   uv run python -m py_compile ./generated/python/*.py
+#
+# Required report:
+#   generated/reports/verify.json

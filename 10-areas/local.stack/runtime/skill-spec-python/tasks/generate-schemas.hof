@@ -1,0 +1,11 @@
+# Generate schemas task contract.
+#
+# Inputs:
+#   specs/cue/*.cue
+#   specs/source/*.json
+#
+# Primary command:
+#   uv run python ./scripts/generate_schemas.py
+#
+# Required outputs:
+#   generated/schemas/*.json

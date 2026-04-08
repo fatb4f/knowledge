@@ -1,0 +1,12 @@
+# Validate task contract.
+#
+# Inputs:
+#   specs/source/*.json
+#   specs/cue/*.cue
+#   specs/fixtures/*.json
+#
+# Primary command:
+#   cue vet ./specs/fixtures/*.json ./specs/cue/*.cue
+#
+# Required report:
+#   generated/reports/validation.json

@@ -1,0 +1,3 @@
+package specpython
+
+#NonEmptyString: string & !=""

@@ -1,0 +1,7 @@
+{
+  "task": "validate",
+  "status": "ok",
+  "checks": [
+    "cue vet specs/fixtures/*.json specs/cue/*.cue"
+  ]
+}

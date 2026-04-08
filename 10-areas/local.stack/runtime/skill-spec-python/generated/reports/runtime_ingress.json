@@ -1,0 +1,6 @@
+{
+  "artifact": "state",
+  "mode": "validate",
+  "ok": true,
+  "reject_unknown_keys": true
+}

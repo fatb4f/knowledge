@@ -1,0 +1,18 @@
+{
+  "artifact_type": "event_envelope",
+  "artifact_version": "v1",
+  "kind": "event",
+  "name": "adapter.start",
+  "ts": "2026-03-31T12:00:00Z",
+  "backend": "gix",
+  "operation": "get_state",
+  "transport": "direct",
+  "data": {},
+  "lineage": {
+    "generated_from": null,
+    "validated_against": [
+      "/home/chronos/src/kernel/runtime/runtime.binding.v1.json",
+      "/home/chronos/.local/opt/knowledge/10-areas/local.stack/runtime/runtime.binding.v1.json"
+    ]
+  }
+}

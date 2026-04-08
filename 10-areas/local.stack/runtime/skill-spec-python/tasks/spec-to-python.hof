@@ -1,0 +1,18 @@
+# Aggregate task contract for the v1 skill.
+#
+# This file is intentionally conservative until `hof` task syntax is pinned.
+# Treat it as the stable execution contract for the surrounding task files.
+#
+# Intended flow:
+#   validate -> generate-python -> generate-schemas -> verify
+#
+# Expected command expansion:
+#   cue vet ./specs/fixtures/*.json ./specs/cue/*.cue
+#   uv run python ./scripts/generate_python.py
+#   uv run python ./scripts/generate_schemas.py
+#   uv run python -m py_compile ./review/inspect_generated.py
+#
+# Expected outputs:
+#   generated/reports/validation.json
+#   generated/reports/generation.json
+#   generated/reports/verify.json

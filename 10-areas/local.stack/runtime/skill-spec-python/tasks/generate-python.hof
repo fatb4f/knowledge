@@ -1,0 +1,13 @@
+# Generate Python task contract.
+#
+# Inputs:
+#   specs/cue/*.cue
+#   generators/python/hof.module.cue
+#   generators/python/templates/*.tmpl
+#
+# Primary command:
+#   uv run python ./scripts/generate_python.py
+#
+# Required outputs:
+#   generated/python/*.py
+#   generated/reports/generation.json

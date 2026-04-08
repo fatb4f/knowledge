@@ -1,0 +1,113 @@
+{
+  "artifact_type": "runtime_binding",
+  "artifact_version": "v1",
+  "binding_id": "default-python-agent-code-mode",
+  "status": "active",
+  "runtime": {
+    "host": "marimo",
+    "host_role": "interactive_control_surface",
+    "env_manager": "uv",
+    "interpreter": {
+      "implementation": "cpython",
+      "version": "3.12.12",
+      "requires_python": ">=3.12,<3.13"
+    }
+  },
+  "entrypoints": {
+    "notebook_host": "runtime/git_state_surfaces/default_agent_code_mode.nb.py",
+    "core_module": "runtime/git_state_surfaces/state_core.py",
+    "cli": "runtime/git_state_surfaces/state_cli.py",
+    "mcp": "runtime/git_state_surfaces/state_mcp.py",
+    "acp": "runtime/git_state_surfaces/state_acp.py",
+    "replay": "runtime/git_state_surfaces/state_replay.py"
+  },
+  "transport": {
+    "default": "direct",
+    "allowed": [
+      "direct",
+      "acp",
+      "mcp"
+    ],
+    "roles": {
+      "direct": "local_runtime_execution",
+      "acp": "external_agent_actuation",
+      "mcp": "read_context_exposure"
+    }
+  },
+  "outputs": {
+    "policy": "structured_outputs_required",
+    "primary_encoding": "json",
+    "stream_encodings": [
+      "ndjson",
+      "jsonl"
+    ],
+    "allow_human_rendered_view": true
+  },
+  "schemas": {
+    "runtime_dto": {
+      "default_library": "msgspec",
+      "allowed_libraries": [
+        "msgspec",
+        "pydantic"
+      ],
+      "pydantic_policy": "optional_boundary_only"
+    },
+    "response_envelope": "runtime/response.envelope.v1.json",
+    "event_envelope": "runtime/event.envelope.v1.json",
+    "check_envelope": "runtime/check.envelope.v1.json"
+  },
+  "adapter_surface": {
+    "projection_unit": "adapter_contract_family",
+    "canonical_logic_location": "plain_python_module",
+    "marimo_role": "thin_host_projection",
+    "shared_callable_surface_required": true
+  },
+  "execution_policy": {
+    "single_logic_surface": true,
+    "notebook_embeds_canonical_logic": false,
+    "allow_replay": true,
+    "allow_packaged_execution": true
+  },
+  "logging": {
+    "session_stream": "runtime/logs/session.ndjson",
+    "checks_stream": "runtime/logs/checks.ndjson",
+    "emit_events": true,
+    "emit_checks": true
+  },
+  "evidence": {
+    "bundle_required_for_promotion": true,
+    "bundle_root": "evidence/",
+    "required_members": [
+      "notebook.py",
+      "manifest.json",
+      "env/pyproject.toml",
+      "env/uv.lock",
+      "logs/session.ndjson",
+      "logs/checks.ndjson",
+      "outputs/export.html",
+      "outputs/summary.json",
+      "gate/admission.json",
+      "gate/review.json"
+    ]
+  },
+  "lineage": {
+    "generated_from": null,
+    "aligned_to": [
+      "/home/chronos/src/kernel/control/modules/state/module.root.v1.json",
+      "/home/chronos/src/kernel/control/modules/state/namespace.contract.v1.json",
+      "/home/chronos/src/kernel/control/modules/state/interop_matrix.v1.json",
+      "/home/chronos/src/kernel/control/modules/state/state.request_response_contract.v1.json",
+      "/home/chronos/src/kernel/control/modules/state/session.metadata.v1.json",
+      "/home/chronos/src/kernel/control/modules/state/output.encodings.v1.json",
+      "/home/chronos/src/kernel/runtime/runtime.binding.v1.json"
+    ],
+    "validated_against": [
+      "/home/chronos/src/kernel/runtime/runtime.binding.v1.json",
+      "/home/chronos/.local/opt/knowledge/10-areas/local.stack/runtime/default_python_environment.v1.md"
+    ]
+  },
+  "notes": [
+    "This runtime binding is authored runtime realization, not kernel semantic authority.",
+    "The local skill-spec runtime.binding schema snapshot is narrower than this file and should be updated later if promoted as the runtime authority schema."
+  ]
+}

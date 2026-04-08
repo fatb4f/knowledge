@@ -1,0 +1,69 @@
+{
+  "artifact_type": "response_envelope",
+  "artifact_version": "v1",
+  "kind": "response",
+  "backend": "gix",
+  "operation": "get_state",
+  "transport": "direct",
+  "encoding": "json",
+  "runtime": {
+    "host": "marimo",
+    "python": "3.12.12"
+  },
+  "payload": {
+    "schema_version": "state.v1",
+    "snapshot_id": "get_state:gix:20260331T120000Z",
+    "repo_ref": {
+      "root": "/home/chronos/src/kernel",
+      "head": "HEAD",
+      "branch": "main"
+    },
+    "observed_at": "2026-03-31T12:00:00Z",
+    "freshness": {
+      "mode": "fresh"
+    },
+    "state": {
+      "git": {},
+      "semantic": {},
+      "workspace": {}
+    },
+    "provenance": {
+      "backend": "gix",
+      "inputs": [],
+      "warnings": []
+    }
+  },
+  "session": {
+    "artifact_type": "session",
+    "artifact_version": "v1",
+    "session_id": "get_state:gix:20260331T120000Z",
+    "host": "marimo",
+    "transport": "direct",
+    "staleness": {
+      "mode": "fresh",
+      "observed_at": "2026-03-31T12:00:00Z"
+    },
+    "lineage_refs": [
+      "backend:gix",
+      "operation:get_state"
+    ]
+  },
+  "output": {
+    "artifact_type": "output",
+    "artifact_version": "v1",
+    "encoding": "json",
+    "schema_ref": "state.v1",
+    "streaming": false
+  },
+  "errors": [],
+  "lineage": {
+    "generated_from": null,
+    "validated_against": [
+      "/home/chronos/src/kernel/control/modules/state/state.request_response_contract.v1.json",
+      "/home/chronos/src/kernel/control/modules/state/session.metadata.v1.json",
+      "/home/chronos/src/kernel/control/modules/state/output.encodings.v1.json",
+      "/home/chronos/src/kernel/runtime/runtime.binding.v1.json",
+      "/home/chronos/.local/opt/knowledge/10-areas/local.stack/runtime/runtime.binding.v1.json"
+    ]
+  }
+}

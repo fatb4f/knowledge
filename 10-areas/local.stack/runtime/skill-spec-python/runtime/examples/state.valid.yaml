@@ -1,0 +1,6 @@
+input:
+  artifact: state
+  payload:
+    schema_version: state.v1
+    snapshot_id: snap-123
+  reject_unknown_keys: true

@@ -1,0 +1,17 @@
+{
+  "task": "generate-python",
+  "status": "ok",
+  "written": [
+    "state_models.py",
+    "session_models.py",
+    "output_models.py",
+    "codecs.py",
+    "__init__.py"
+  ],
+  "target": "msgspec.Struct",
+  "sources": {
+    "state.schema.json": "state.v1",
+    "session.schema.json": "session.v1",
+    "output.schema.json": "output.v1"
+  }
+}

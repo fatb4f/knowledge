@@ -1,0 +1,9 @@
+{
+  "task": "generate-schemas",
+  "status": "ok",
+  "written": [
+    "state.v1.schema.json",
+    "session.v1.schema.json",
+    "output.v1.schema.json"
+  ]
+}
